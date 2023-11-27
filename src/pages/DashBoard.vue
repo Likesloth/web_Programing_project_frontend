@@ -42,7 +42,9 @@
 
         <div class="bg-white p-4 rounded shadow">
           <h2 class="text-xl font-bold mb-4">Weekly Overview</h2>
-          <canvas ref="chart"></canvas>
+          <div>
+            <canvas id="myChart" style="width: 100%; height: 300px;"></canvas>
+          </div>
         </div>
       </div>
     </div>
@@ -51,12 +53,11 @@
 
 <script>
 
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref } from 'vue';
 import { Notify } from "quasar";
 import { useLoginUserStore } from "src/stores/loginUserStrore";
 import moment from 'moment';
-
-
+import Chart from 'chart.js/auto';
 
 export default defineComponent({
   name: 'DashBoard',
@@ -80,8 +81,9 @@ export default defineComponent({
       totalIncomeToday: 0,
       totalUserToday: 0,
       totalHourToday: 0,
+      MostBookedRoom: [],
       storeLogUser: useLoginUserStore(),
-
+      chart: null,
     };
   },
   methods: {
@@ -94,7 +96,7 @@ export default defineComponent({
         BookingDate: date,
       };
       this.$api
-        .put("booking/getTotalIncome", requestBody , { headers })
+        .put("booking/getTotalIncome", requestBody, { headers })
         .then((res) => {
           if (res.status == 200) {
             Notify.create({
@@ -160,17 +162,84 @@ export default defineComponent({
           this.showErrDialog(err);
         });
     },
-    onclickgetall() {
-      this.getIncome(),
-        this.getUser(),
-        this.getTotalHour()
+    async getMostBookedRoom() {
+      const headers = {
+        'x-access-token': this.storeLogUser.accessToken,
+      };
+
+      const date = moment(this.date).format('YYYY-MM-DD'); // Format the date
+      const requestBody = {
+        BookingDate: date,
+      };
+
+      try {
+        const res = await this.$api.put("/booking/mostbookedroom", requestBody, { headers });
+
+        if (res.status === 200) {
+          this.MostBookedRoom = res.data.map((MostBookedRoomObj) => ({
+            RoomNumber: MostBookedRoomObj.RoomNumber,
+            BookingCount: MostBookedRoomObj.BookingCount,
+          }));
+          console.log("Most Booked Room Data:", this.MostBookedRoom);
+        }
+      } catch (err) {
+        console.log(err);
+        this.showErrDialog(err);
+      }
+    },
+
+    async onclickgetall() {
+      await this.getIncome();
+      await this.getUser();
+      await this.getTotalHour();
+      await this.getMostBookedRoom();
+      // Extract labelsBooked and data from MostBookedRoom
+      const labelsBooked = this.MostBookedRoom.map((room) => room.RoomNumber);
+      const dataBooked = this.MostBookedRoom.map((room) => room.BookingCount);
+
+      this.updateChart(labelsBooked, dataBooked);// Corrected method name
+    },
+    async updateChartData() {
+      await this.getIncome();
+      await this.getUser();
+      await this.getTotalHour();
+      await this.getMostBookedRoom();
+      // Extract labelsBooked and data from MostBookedRoom
+      const labelsBooked = this.MostBookedRoom.map((room) => room.RoomNumber);
+      const dataBooked = this.MostBookedRoom.map((room) => room.BookingCount);
+
+      this.updateChart(labelsBooked, dataBooked);
+    },
+    updateChart(labelsBooked, dataBooked) {
+      const ctx = document.getElementById('myChart');
+
+      if (this.chart) {
+        this.chart.destroy();
+      }
+
+      this.chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labelsBooked,
+          datasets: [{
+            label: 'Booking Count',
+            data: dataBooked,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
     },
   },
 
   async mounted() {
-    await this.getIncome();
-    await this.getUser();
-    await this.onclickgetall();
+    await this.updateChartData();
   },
 });
 
