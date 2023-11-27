@@ -36,53 +36,77 @@
               <div
                 v-for="(val, property, index) in SmRoom"
                 :key="index"
+                :color="isRoomNotAvailable(val.RoomNumber) ? 'red' : 'primary'"
                 class="flex justify-center h-full flex-col items-center"
               >
-                <q-btn color="primary" class="w-[70%] text-2xl">{{
-                  val.RoomNumber
-                }}</q-btn>
+                <q-btn color="primary" class="w-[70%] text-2xl"
+                 @click="navigateToBookRoom(val)"
+                  >{{ val.RoomNumber }}
+                  <div
+                    v-if="isRoomNotAvailable(val.RoomNumber)"
+                    class="text-sm"
+                  >
+                    Non Available
+                  </div>
+                </q-btn>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="h-full w-[30%]">
+      <div class="h-full w-[30%] flex flex-col">
         <div class="w-full flex h-[10%] py-3 justify-center">
-          <div class="text-center flex font">MEDIUM</div>
+          <div class="text-center flex font">SMALL</div>
         </div>
 
         <div class="w-full h-[90%] items-start justify-center">
           <div class="h-full w-full">
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-2 gap-3 min-h-[15%] items-center w-full">
               <div
                 v-for="(val, property, index) in MdRoom"
                 :key="index"
-                class="flex justify-center"
+                :color="isRoomNotAvailable(val.RoomNumber) ? 'red' : 'primary'"
+                class="flex justify-center h-full flex-col items-center"
               >
-                <q-btn color="primary" icon="eco" class="grid-cols-2">{{
-                  val.RoomNumber
-                }}</q-btn>
+                <q-btn color="primary" class="w-[70%] text-2xl"
+                 @click="navigateToBookRoom(val)"
+                  >{{ val.RoomNumber }}
+                  <div
+                    v-if="isRoomNotAvailable(val.RoomNumber)"
+                    class="text-sm"
+                  >
+                    Non Available
+                  </div>
+                </q-btn>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="h-full w-[30%]">
+      <div class="h-full w-[30%] flex flex-col">
         <div class="w-full flex h-[10%] py-3 justify-center">
-          <div class="text-center flex font">LARGE</div>
+          <div class="text-center flex font">SMALL</div>
         </div>
 
         <div class="w-full h-[90%] items-start justify-center">
           <div class="h-full w-full">
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-2 gap-3 min-h-[15%] items-center w-full">
               <div
                 v-for="(val, property, index) in LgRoom"
                 :key="index"
-                class="flex justify-center"
+                :color="isRoomNotAvailable(val.RoomNumber) ? 'red' : 'primary'"
+                class="flex justify-center h-full flex-col items-center"
               >
-                <q-btn color="primary" icon="eco" class=" ">{{
-                  val.RoomNumber
-                }}</q-btn>
+                <q-btn color="primary" class="w-[70%] text-2xl"
+                 @click="navigateToBookRoom(val)"
+                  >{{ val.RoomNumber }}
+                  <div
+                    v-if="isRoomNotAvailable(val.RoomNumber)"
+                    class="text-sm"
+                  >
+                    Non Available
+                  </div>
+                </q-btn>
               </div>
             </div>
           </div>
@@ -235,13 +259,14 @@ import { useLoginUserStore } from "../stores/loginUserStrore";
 import { Notify } from "quasar";
 import { ref } from "vue";
 import DialogComponent from "src/components/DialogComponent.vue";
-
 export default defineComponent({
   name: "ListUserPage",
   setup() {
     const currentDate = new Date();
     const formattedDate = ref(currentDate.toISOString()); // or currentDate.toDateString() or any other format
     console.log(formattedDate);
+
+   
     return {
       date: formattedDate,
     };
@@ -249,12 +274,14 @@ export default defineComponent({
   data() {
     return {
       dataReady: false,
+      nowtDate: "",
       rows: [],
       rooms: [],
       SmRoom: [],
       MdRoom: [],
       LgRoom: [],
-      times: "",
+      timeID: [],
+      freeroom: [],
       columns: [
         {
           name: "id",
@@ -278,6 +305,7 @@ export default defineComponent({
       input: [],
       form_edit: false,
       form_delete: false,
+      currentTime:"",
       showDialog: false,
       dialog: {
         icon: "",
@@ -303,11 +331,74 @@ export default defineComponent({
               return {
                 id: user.UserID,
                 fullname: user.Name,
-
                 // Add other properties as needed
               };
             });
             console.log("rows is " + this.rows);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          Notify.create({
+            type: "negative",
+            message: "Unauthorized",
+          });
+
+        });
+    },
+    getfreeroom() {
+       const currentDate = new Date();
+    const formattedDate = ref(currentDate.toISOString()); // or currentDate.toDateString() or any other format
+    
+      const data = {
+        CurrentTime: this.currentTime,
+        CurrentDate: this.formattedDate
+      };
+      console.log("token:" + this.storeLogUser.accessToken);
+      const headers = {
+        "x-access-token": this.storeLogUser.accessToken,
+      };
+      console.log("headers:" + JSON.stringify(headers));
+      this.$api
+        .get("/auth/", { headers },data)
+        .then((res) => {
+          if (res.status == 200) {
+            this.freeroom = res.data.map((user) => {
+              return {
+                RoomNumber: user.RoomNumber,
+              };
+            });
+            console.log("free room is " + this.freeroom);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          Notify.create({
+            type: "negative",
+            message: "Unauthorized",
+          });
+          // this.storeLogUser.clearStorage();
+          // this.$router.push("/");
+        });
+    },
+    getAlltime() {
+      console.log("Get All Time ->> token:" + this.storeLogUser.accessToken);
+      const headers = {
+        "x-access-token": this.storeLogUser.accessToken,
+      };
+      console.log("headers:" + JSON.stringify(headers));
+      this.$api
+        .get("/booking/gettime", { headers })
+        .then((res) => {
+          if (res.status == 200) {
+            res.data.map((timesObj) => {
+              this.timeID.push({
+                Id: timesObj.Id,
+                Time: timesObj.Time,
+              });
+            });
+            
+            console.log("show time " + this.timeID);
           }
         })
         .catch((err) => {
@@ -483,6 +574,27 @@ export default defineComponent({
     getFileName() {
       return filepath.substr(filepath.lastIndexOf("/") + 1);
     },
+    getCurrentTimeAndDate() {
+      const now = new Date();
+      const options = {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false, // Use 24-hour format
+      };
+      
+
+      const formattedTime = now.toLocaleString("en-US", options);
+
+      this.currentTime = formattedTime;
+    
+      console.log(" current time ->>   "+ this.currentTime);
+
+    },
+    navigateToBookRoom(val) {
+     const encodedVal = encodeURIComponent(JSON.stringify(val));
+  this.$router.push({ name: 'bookroom', params: { val: encodedVal } });
+  },
     submitEditData(filename) {
       let img = "";
       if (filename == null) {
@@ -525,10 +637,19 @@ export default defineComponent({
   async mounted() {
     await this.getAllUsers();
     await this.getAllRoom();
+    await this.getAlltime();
+    await this.getfreeroom();
+    await this.getCurrentTimeAndDate();
 
     console.log("token@mount:" + this.storeLogUser.accessToken);
     this.dataReady = true;
   },
   components: { DialogComponent },
+  computed: {
+    isRoomNotAvailable() {
+      return (roomNumber) =>
+        this.freeroom.some((croom) => croom.RoomNumber === roomNumber);
+    },
+  },
 });
 </script>
