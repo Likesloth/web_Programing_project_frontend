@@ -1,14 +1,16 @@
 <template>
-    <q-page class="flex flex-center">
-      <q-card dark bordered class="bg-grey-2 my-card q-px-md p-py-md">
+  <q-page class="flex flex-center">
+    <q-card dark bordered class="bg-grey-2 my-card q-px-md p-py-md">
       <div class="flex flex-center">
         <q-icon name="account_circle" color="grey-6" size="4rem" />
       </div>
       <q-card-section>
-        <q-form @submit.prevent="onSubmit" 
-        @reset="onReset" 
-        class="q-gutter-md"
-        ref="loginForm">
+        <q-form
+          @submit.prevent="onSubmit"
+          @reset="onReset"
+          class="q-gutter-md"
+          ref="loginForm"
+        >
           <div>
             <q-input
               v-model="username"
@@ -38,73 +40,76 @@
             </q-input>
           </div>
           <div>
-            <q-btn label="Submit" type="submit" color="primary" style="width: 100%;" />
+            <q-btn
+              label="Submit"
+              type="submit"
+              color="primary"
+              style="width: 100%"
+            />
           </div>
           <div>
-            <text-caption class="text-cyan-8">Not registered?
-              <a href="/register">Create an Account</a>
+            <text-caption class="text-cyan-8"
+              >Not registered?
+              <a href="/#/register">Create an Account</a>
             </text-caption>
           </div>
         </q-form>
       </q-card-section>
     </q-card>
-    </q-page>
-  </template>
-  
-  <script>
-  import { defineComponent } from 'vue'
-  import { useLoginUserStore } from "../stores/loginUserStrore" 
-  import { Notify } from 'quasar'
-  import { requiredValidate } from "../utils/validations";
-  export default defineComponent({
-    name: 'LoginPage',
-    data(){
-      return{
-        storeLogUser: useLoginUserStore(),
-        isPwd: true,
-        password: null,
-        username: null
-      }
+  </q-page>
+</template>
+
+<script>
+import { defineComponent } from "vue";
+import { useLoginUserStore } from "../stores/loginUserStrore";
+import { Notify } from "quasar";
+import { requiredValidate } from "../utils/validations";
+export default defineComponent({
+  name: "LoginPage",
+  data() {
+    return {
+      storeLogUser: useLoginUserStore(),
+      isPwd: true,
+      password: null,
+      username: null,
+    };
+  },
+  methods: {
+    requiredValidate,
+    onReset() {
+      this.username = null;
+      this.password = null;
+      this.isPwd = true;
     },
-    methods:{
-      requiredValidate,
-      onReset(){
-        this.username = null;
-        this.password = null;
-        this.isPwd = true;
-      },
-      onSubmit(){
-        const data = {
-          username: this.username,
-          password: this.password
-        }
-        this.$api
+    onSubmit() {
+      const data = {
+        username: this.username,
+        password: this.password,
+      };
+      this.$api
         .post("/auth/login", data)
-        .then((res)=>{
-          if(res.status == 200){
+        .then((res) => {
+          if (res.status == 200) {
             Notify.create({
               type: "positive",
-              message: "Login sucessfully"
+              message: "Login sucessfully",
             });
-            console.log(res.status)
-            console.log()
+            console.log(res.status);
+            console.log();
             this.storeLogUser.userid = res.data.UserID;
-
             this.storeLogUser.fullname = res.data.Name;
             this.storeLogUser.accessToken = res.data.accessToken;
             this.$router.push("/user");
-            
           }
         })
-        .catch((err)=>{
+        .catch((err) => {
           console.log(err);
           Notify.create({
             type: "negative",
-            message: "Invalid username or password"
+            message: "Invalid username or password",
           });
         });
-      }
-    }
-  })
-  </script>
-  
+    },
+  },
+});
+</script>

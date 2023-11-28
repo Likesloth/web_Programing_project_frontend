@@ -25,9 +25,9 @@
       </div>
     </div>
     <div class="h-[70vh] flex justify-around">
-      <div class="h-full w-[30%] flex flex-col">
+       <div class="h-full w-[30%] flex flex-col">
         <div class="w-full flex h-[10%] py-3 justify-center">
-          <div class="text-center flex font">SMALL</div>
+          <div class="text-center flex font">small</div>
         </div>
 
         <div class="w-full h-[90%] items-start justify-center">
@@ -36,27 +36,35 @@
               <div
                 v-for="(val, property, index) in SmRoom"
                 :key="index"
-                :color="isRoomNotAvailable(val.RoomNumber) ? 'red' : 'primary'"
                 class="flex justify-center h-full flex-col items-center"
               >
-                <q-btn color="primary" class="w-[70%] text-2xl"
-                 @click="navigateToBookRoom(val)"
-                  >{{ val.RoomNumber }}
+                <!-- Check if the room is not available -->
+                <template v-if="isRoomNotAvailable(val.RoomID)">
                   <div
-                    v-if="isRoomNotAvailable(val.RoomNumber)"
-                    class="text-sm"
+                    class="non-available-room text-center bg-red-400 p-2 drop-shadow-xl border rounded-xl"
                   >
-                    Non Available
+                    {{ val.RoomNumber }}
+                    <div class="text-sm">Non Available</div>
                   </div>
-                </q-btn>
+                </template>
+                <!-- If the room is available, show the button -->
+                <template v-else>
+                  <q-btn
+                    color="primary"
+                    class="w-[70%] text-2xl"
+                    @click="navigateToBookRoom(val)"
+                  >
+                    {{ val.RoomNumber }}
+                  </q-btn>
+                </template>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="h-full w-[30%] flex flex-col">
+ <div class="h-full w-[30%] flex flex-col">
         <div class="w-full flex h-[10%] py-3 justify-center">
-          <div class="text-center flex font">SMALL</div>
+          <div class="text-center flex font">Medium</div>
         </div>
 
         <div class="w-full h-[90%] items-start justify-center">
@@ -65,19 +73,27 @@
               <div
                 v-for="(val, property, index) in MdRoom"
                 :key="index"
-                :color="isRoomNotAvailable(val.RoomNumber) ? 'red' : 'primary'"
                 class="flex justify-center h-full flex-col items-center"
               >
-                <q-btn color="primary" class="w-[70%] text-2xl"
-                 @click="navigateToBookRoom(val)"
-                  >{{ val.RoomNumber }}
+                <!-- Check if the room is not available -->
+                <template v-if="isRoomNotAvailable(val.RoomID)">
                   <div
-                    v-if="isRoomNotAvailable(val.RoomNumber)"
-                    class="text-sm"
+                    class="non-available-room text-center bg-red-400 p-2 drop-shadow-xl border rounded-xl"
                   >
-                    Non Available
+                    {{ val.RoomNumber }}
+                    <div class="text-sm">Non Available</div>
                   </div>
-                </q-btn>
+                </template>
+                <!-- If the room is available, show the button -->
+                <template v-else>
+                  <q-btn
+                    color="primary"
+                    class="w-[70%] text-2xl"
+                    @click="navigateToBookRoom(val)"
+                  >
+                    {{ val.RoomNumber }}
+                  </q-btn>
+                </template>
               </div>
             </div>
           </div>
@@ -85,7 +101,7 @@
       </div>
       <div class="h-full w-[30%] flex flex-col">
         <div class="w-full flex h-[10%] py-3 justify-center">
-          <div class="text-center flex font">SMALL</div>
+          <div class="text-center flex font">Large</div>
         </div>
 
         <div class="w-full h-[90%] items-start justify-center">
@@ -94,69 +110,32 @@
               <div
                 v-for="(val, property, index) in LgRoom"
                 :key="index"
-                :color="isRoomNotAvailable(val.RoomNumber) ? 'red' : 'primary'"
                 class="flex justify-center h-full flex-col items-center"
               >
-                <q-btn color="primary" class="w-[70%] text-2xl"
-                 @click="navigateToBookRoom(val)"
-                  >{{ val.RoomNumber }}
+                <!-- Check if the room is not available -->
+                <template v-if="isRoomNotAvailable(val.RoomID)">
                   <div
-                    v-if="isRoomNotAvailable(val.RoomNumber)"
-                    class="text-sm"
+                    class="non-available-room text-center bg-red-400 p-2 drop-shadow-xl border rounded-xl"
                   >
-                    Non Available
+                    {{ val.RoomNumber }}
+                    <div class="text-sm">Non Available</div>
                   </div>
-                </q-btn>
+                </template>
+                <!-- If the room is available, show the button -->
+                <template v-else>
+                  <q-btn
+                    color="primary"
+                    class="w-[70%] text-2xl"
+                    @click="navigateToBookRoom(val)"
+                  >
+                    {{ val.RoomNumber }}
+                  </q-btn>
+                </template>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div style="width: 50%">Token: {{ this.storeLogUser.accessToken }}</div>
-    <div v-if="dataReady">
-      <!-- Data completed -->
-      <q-table
-        title="List of users"
-        :columns="columns"
-        :rows="rows"
-        row-key="id"
-        :pagination="paginations"
-      >
-        <template #body="props">
-          <q-tr :props="props">
-            <q-td key="id" :props="props"> {{ props.row.id }}</q-td>
-            <q-td key="fullname" :props="props"> {{ props.row.fullname }}</q-td>
-            <q-td key="email" :props="props"> {{ props.row.email }}</q-td>
-            <q-td key="action">
-              <q-btn
-                color="primary"
-                flat
-                round
-                icon="edit"
-                @click="editRecord(props.row)"
-              />
-              <q-btn
-                color="primary"
-                flat
-                round
-                icon="delete"
-                @click="deleteRecord(props.row)"
-              />
-            </q-td>
-          </q-tr>
-        </template>
-      </q-table>
-    </div>
-    <div v-else>
-      <!-- Loading data -->
-      <q-circular-progress
-        indeterminate
-        rounded
-        size="50px"
-        color="lime"
-        class="q-ma-md"
-      />
     </div>
     <!-- Edit Dialog -->
     <q-dialog v-model="form_edit" persistent>
@@ -228,7 +207,6 @@
           <q-avatar icon="delete" color="primary" text-color="white" />
           <span class="q-ml-sm">Delete user ID: {{ input.id }}</span>
         </q-card-section>
-
         <q-card-section>
           <span class="q-ml-sm">Fullname: {{ input.fullname }}</span>
         </q-card-section>
@@ -263,19 +241,24 @@ export default defineComponent({
   name: "ListUserPage",
   setup() {
     const currentDate = new Date();
-    const formattedDate = ref(currentDate.toISOString()); // or currentDate.toDateString() or any other format
+    const formattedDate = ref(currentDate.toISOString().split("T")[0]); // Extracts the date part
     console.log(formattedDate);
+    const selectedDate = ref({
+      day: currentDate.getDate(),
+      month: currentDate.getMonth() + 1,
+      year: currentDate.getFullYear(),
+    });
 
-   
     return {
       date: formattedDate,
+      selectedDate,
     };
   },
   data() {
     return {
       dataReady: false,
-      nowtDate: "",
       rows: [],
+      theroomFull: [],
       rooms: [],
       SmRoom: [],
       MdRoom: [],
@@ -305,8 +288,9 @@ export default defineComponent({
       input: [],
       form_edit: false,
       form_delete: false,
-      currentTime:"",
+      currentTime: "",
       showDialog: false,
+      selectedDateTime: null,
       dialog: {
         icon: "",
         msg: "",
@@ -317,6 +301,60 @@ export default defineComponent({
     };
   },
   methods: {
+    isRoomNotAvailable(roomnumber) {
+      console.log("Checking for room " + roomnumber);
+
+      // Check if this.theroomFull is an array and has at least one element
+      if (Array.isArray(this.theroomFull) && this.theroomFull.length > 0) {
+        // Use the some function to check if roomnumber matches any RoomID
+        return this.theroomFull.some((room) => room.RoomID === roomnumber);
+      }
+
+      // If this.theroomFull is not an array or is empty, return false
+      return false;
+    },
+
+    async getHRoom(dateinput) {
+      try {
+        const data = {
+          BookingDate: dateinput,
+        };
+
+        const headers = {
+          "x-access-token": this.storeLogUser.accessToken,
+        };
+
+        const response = await this.$api.put("/booking/gettimefull", data, {
+          headers,
+        });
+
+        if (response.status === 200) {
+          const roomFullData = response.data;
+
+          // Check if there is data
+          if (roomFullData.length > 0) {
+            this.theroomFull = roomFullData.map((temp) => ({
+              SUM_TOTalHour: temp.SUM_TOTalHour,
+              RoomID: temp.RoomID,
+            }));
+            console.log(this.theroomFull);
+          } else {
+            // Handle the case when there is no data
+            console.log("No room availability data for the given date");
+          }
+        } else {
+          // Handle the case when the API request is not successful
+          console.log("Error fetching room availability data");
+        }
+      } catch (error) {
+        // Handle other errors
+        console.error("Error in getHRoom:", error);
+        Notify.create({
+          type: "negative",
+          message: "Error fetching room availability data",
+        });
+      }
+    },
     getAllUsers() {
       console.log("token:" + this.storeLogUser.accessToken);
       const headers = {
@@ -343,16 +381,14 @@ export default defineComponent({
             type: "negative",
             message: "Unauthorized",
           });
-
         });
     },
     getfreeroom() {
-       const currentDate = new Date();
-    const formattedDate = ref(currentDate.toISOString()); // or currentDate.toDateString() or any other format
-    
+      const currentDate = new Date();
+      const formattedDate = ref(currentDate.toISOString()); // or currentDate.toDateString() or any other format
+
       const data = {
-        CurrentTime: this.currentTime,
-        CurrentDate: this.formattedDate
+        CurrentDate: this.date,
       };
       console.log("token:" + this.storeLogUser.accessToken);
       const headers = {
@@ -360,7 +396,7 @@ export default defineComponent({
       };
       console.log("headers:" + JSON.stringify(headers));
       this.$api
-        .get("/auth/", { headers },data)
+        .get("/auth/", { headers }, data)
         .then((res) => {
           if (res.status == 200) {
             this.freeroom = res.data.map((user) => {
@@ -375,7 +411,7 @@ export default defineComponent({
           console.log(err);
           Notify.create({
             type: "negative",
-            message: "Unauthorized",
+            message: "cannot get the data from server",
           });
           // this.storeLogUser.clearStorage();
           // this.$router.push("/");
@@ -397,7 +433,7 @@ export default defineComponent({
                 Time: timesObj.Time,
               });
             });
-            
+
             console.log("show time " + this.timeID);
           }
         })
@@ -432,7 +468,7 @@ export default defineComponent({
               };
             });
             res.data.map((room) => {
-              if (room.SizeID === 1) {
+              if (room.SizeID === 1 && room.status === "N") {
                 this.SmRoom.push({
                   RoomID: room.RoomID,
                   RoomNumber: room.RoomNumber,
@@ -441,11 +477,7 @@ export default defineComponent({
                 });
                 return {};
               }
-            });
-            console.log("small rooms --> " + this.SmRoom);
-            console.log(this.SmRoom);
-            res.data.map((room) => {
-              if (room.SizeID === 2) {
+              if (room.SizeID === 2 && room.status === "N") {
                 this.MdRoom.push({
                   RoomID: room.RoomID,
                   RoomNumber: room.RoomNumber,
@@ -454,11 +486,7 @@ export default defineComponent({
                 });
                 return {};
               }
-            });
-            console.log("medium rooms --> " + this.MdRoom);
-
-            res.data.map((room) => {
-              if (room.SizeID === 3) {
+              if (room.SizeID === 3 && room.status === "N") {
                 this.LgRoom.push({
                   RoomID: room.RoomID,
                   RoomNumber: room.RoomNumber,
@@ -468,9 +496,6 @@ export default defineComponent({
                 return {};
               }
             });
-            console.log("Large rooms --> " + this.LgRoom);
-
-            console.log("now is all room  ->>>" + this.rooms);
           }
         })
         .catch((err) => {
@@ -582,19 +607,23 @@ export default defineComponent({
         second: "2-digit",
         hour12: false, // Use 24-hour format
       };
-      
 
       const formattedTime = now.toLocaleString("en-US", options);
 
       this.currentTime = formattedTime;
-    
-      console.log(" current time ->>   "+ this.currentTime);
 
+      console.log(" current time ->>   " + this.currentTime);
     },
     navigateToBookRoom(val) {
-     const encodedVal = encodeURIComponent(JSON.stringify(val));
-  this.$router.push({ name: 'bookroom', params: { val: encodedVal } });
-  },
+      console.log("this is date : " + this.date);
+      const encodedVal = encodeURIComponent(JSON.stringify(val));
+      const encodedeate = encodeURIComponent(JSON.stringify(this.date));
+
+      this.$router.push({
+        name: "bookroom",
+        params: { val: encodedVal, date: encodedeate },
+      });
+    },
     submitEditData(filename) {
       let img = "";
       if (filename == null) {
@@ -607,7 +636,7 @@ export default defineComponent({
         img: img,
       };
       const headers = {
-        "x-access-token": this.storeLogUser.accessToken,
+        "x-accss-token": this.storeLogUser.acctToken,
       };
       this.$api
         .put("/auth/" + this.input.id, data, { headers })
@@ -633,6 +662,13 @@ export default defineComponent({
           this.showErrDialog(err);
         });
     },
+    clearAllData() {
+      this.rooms = [];
+      this.SmRoom = [];
+      this.MdRoom = [];
+      this.LgRoom = [];
+      this.theroomFull = [];
+    },
   },
   async mounted() {
     await this.getAllUsers();
@@ -640,15 +676,22 @@ export default defineComponent({
     await this.getAlltime();
     await this.getfreeroom();
     await this.getCurrentTimeAndDate();
-
+    await this.getHRoom(this.date);
     console.log("token@mount:" + this.storeLogUser.accessToken);
     this.dataReady = true;
   },
   components: { DialogComponent },
-  computed: {
-    isRoomNotAvailable() {
-      return (roomNumber) =>
-        this.freeroom.some((croom) => croom.RoomNumber === roomNumber);
+  watch: {
+    date(newDate, oldDate) {
+      // This function will be called whenever the 'date' property changes
+      // You can call your functions here to re-run them
+       this.clearAllData();
+      this.getHRoom(newDate);
+      this.getAllUsers();
+      this.getfreeroom();
+      this.getAlltime();
+      this.getAllRoom();
+      this.getCurrentTimeAndDate();
     },
   },
 });
